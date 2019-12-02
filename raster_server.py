@@ -1,4 +1,5 @@
 from io import BytesIO
+import os
 import requests
 import json
 from flask import Flask, send_file
@@ -21,11 +22,10 @@ def hello():
 @app.route('/image/<z>/<x>/<y>')
 def serve_img(z=None,x=None,y=None):
     y = y.replace('.png', '')
-    url = "http://localhost:8081/data/japan_smallArea/{0}/{1}/{2}.geojson".format(z,x,y)
+    url = os.environ['GEOJSON_SRC_URL'].format(z,x,y)
     response = requests.get(url)
     features = json.loads(response.text)["features"]
     df_gpd = GeoDataFrame.from_features(features).loc[:,["KEY_CODE", "geometry"]]
-    print(df_gpd.head(1).loc[:,"KEY_CODE"])
     im = geojson2png(
         df_gpd=df_gpd,
         tile_x=x, tile_y=y, tile_z=z,
