@@ -45,7 +45,9 @@ def geojson2png(df_gpd=None, tile_x=0, tile_y=0, tile_z=0, FIG_SIZE=FIG_SIZE):
         lat = 2 * atan(e ** (- mapy)) * 180 / pi - 90
         return (lon, lat) # (x, y) = (経度, 緯度)
 
+    # get tile's left upper(north west) coords
     x_min, y_max = tile2latlon(tile_x, tile_y, tile_z)
+    # get tile's right lower(south east) coords
     x_max, y_min = tile2latlon(tile_x+1, tile_y+1, tile_z)
 
     def append_coords_to_list(coords, target_x_list, target_y_list):
@@ -97,9 +99,28 @@ def geojson2png(df_gpd=None, tile_x=0, tile_y=0, tile_z=0, FIG_SIZE=FIG_SIZE):
 
 
 def geojson_file2png_file(inputFilePath=None, outputFilePath=None, tile_x=0, tile_y=0, tile_z=0, FIG_SIZE=FIG_SIZE):
-    df_gpd = gpd.read_file(inputFilePath)
+    """output png file from geojson file
+
+    Parameters
+    ----------
+    inputFilePath : str
+        source data file path(geojson)
+    outputFilePath : str
+        output data file path(png)
+    tile_x : int
+        tile x coords
+    tile_y : int
+        tile y coords
+    tile_z : int
+        tile z coords
+    FIG_SIZE : int
+        raster image size
+            
+    """
+
+    df_gpd = gpd.read_file(inputFilePath) # geojson -> geopandas.DataFrame
     im = geojson2png(df_gpd, tile_x, tile_y, tile_z, FIG_SIZE)
-    im.save(outputFilePath)
+    im.save(outputFilePath) # イメージ出力
 
 
 if __name__ == "__main__":
