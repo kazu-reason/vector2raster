@@ -1,5 +1,5 @@
 # vector2raster
-Converting vector to raster with specified color for map tile layer
+> Converting vector to raster with specified color for map tile layer
 
 - Vector: only support for geojson now
 - Raster: only support for geojson now
@@ -20,3 +20,13 @@ $ cp .env_template .env
 $ pipenv sync
 $ pipenv run start
 ```
+
+## Feature work
+- Support mbtiles with pbf(mvt) tiles for input
+- Support mbtiles with png tiles for output
+- Support styling(coloring) depends on
+  - attribute
+  - reference tabel to decide coloring with `KEY_CODE`
+    - csv 
+    - DB
+- Support more geojson feature types
