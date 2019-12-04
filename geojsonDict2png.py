@@ -43,18 +43,9 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
 
         return (image_x, image_y)
     
-    
-    for feature in features:
-        geometry = feature.get("geometry")
-        geometryType = geometry.get("type")
-        geometryCoords = geometry.get("coordinates")
-        properties = feature.get("properties")
-        KEY_CODE = properties.get("KEY_CODE")
 
-        # variables for loop
+    def polygon_loop(geometryCoords=None, draw=None):
         func_PII = position_in_image
-        # if geometryType == "Polygon":
-            
         for coords_1 in geometryCoords:
             image_xy_list = []
             for coords_2 in coords_1:
@@ -63,13 +54,44 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
                 image_xy_list.append(image_coords)
 
             # draw polygons from image_xy_list
-            # for xy in image_xy_list:
             rand_tuple = (
                 55+random.randint(0,200),
                 55+random.randint(0,200),
                 55+random.randint(0,200)
             )
             draw.polygon(xy=image_xy_list, fill=rand_tuple)
+    
+    
+    def multiPolygon_loop(geometryCoords=None, draw=None):
+        func_PII = position_in_image
+        for coords_1 in geometryCoords:
+            for coords_2 in coords_1:
+                image_xy_list = []
+                for coords_3 in coords_2:
+                    x,y = coords_3
+                    image_coords = func_PII(x,y)
+                    image_xy_list.append(image_coords)
+
+                # draw polygons from image_xy_list
+                rand_tuple = (
+                    55+random.randint(0,200),
+                    55+random.randint(0,200),
+                    55+random.randint(0,200)
+                )
+                draw.polygon(xy=image_xy_list, fill=rand_tuple)
+    
+    
+    for feature in features:
+        geometry = feature.get("geometry")
+        geometryType = geometry.get("type")
+        geometryCoords = geometry.get("coordinates")
+        properties = feature.get("properties")
+        KEY_CODE = properties.get("KEY_CODE")
+
+        if geometryType == "Polygon":
+            polygon_loop(geometryCoords=geometryCoords, draw=draw)
+        elif geometryType == "MultiPolygon":
+            multiPolygon_loop(geometryCoords=geometryCoords, draw=draw)
 
     # flip because 
     # Pillow's      axis origin is left upper side
