@@ -111,3 +111,4 @@ dmypy.json
 
 data/*
 .env
+.vscode/
