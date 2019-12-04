@@ -28,7 +28,7 @@ def serve_img(z=None,x=None,y=None):
     df_gpd = GeoDataFrame.from_features(features).loc[:,["KEY_CODE", "geometry"]]
     im = geojson2png(
         df_gpd=df_gpd,
-        tile_x=x, tile_y=y, tile_z=z,
+        tile_z=z,tile_x=x, tile_y=y,
         FIG_SIZE=256
     )
     send_content = serve_pil_image(im)

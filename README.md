@@ -30,7 +30,7 @@ $ pipenv run start
 ### Convert from mbtiles
 ```bash
 # file to file conversion
-$ python geojsonDict2png.py your_mbtiles output.png x y z 
+$ python geojsonDict2png.py your_mbtiles output.png z x y
 ```
 
 ## Feature work

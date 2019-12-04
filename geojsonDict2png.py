@@ -80,7 +80,7 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
                 )
                 draw.polygon(xy=image_xy_list, fill=rand_tuple)
     
-    
+
     for feature in features:
         geometry = feature.get("geometry")
         geometryType = geometry.get("type")
@@ -102,7 +102,7 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
     return im_flip
 
 
-def geojson_file2png_file(inputFilePath=None, outputFilePath=None, tile_x=0, tile_y=0, tile_z=0, FIG_SIZE=FIG_SIZE):
+def geojson_file2png_file(inputFilePath=None, outputFilePath=None, tile_z=0, tile_x=0, tile_y=0, FIG_SIZE=FIG_SIZE):
     """output png file from geojson file
 
     Parameters
@@ -111,12 +111,12 @@ def geojson_file2png_file(inputFilePath=None, outputFilePath=None, tile_x=0, til
         source data file path(geojson)
     outputFilePath : str
         output data file path(png)
+    tile_z : int
+        tile z coords
     tile_x : int
         tile x coords
     tile_y : int
         tile y coords
-    tile_z : int
-        tile z coords
     FIG_SIZE : int
         raster image size
             
@@ -135,5 +135,5 @@ if __name__ == "__main__":
     else:
         geojson_file2png_file(
             sys.argv[1], sys.argv[2], # path args
-            sys.argv[3], sys.argv[4], sys.argv[5] # x/y/z args
+            sys.argv[3], sys.argv[4], sys.argv[5] # z/x/y args
         )

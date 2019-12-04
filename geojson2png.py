@@ -8,7 +8,7 @@ import shapely
 
 FIG_SIZE = 256
 
-def geojson2png(df_gpd=None, tile_x=0, tile_y=0, tile_z=0, FIG_SIZE=FIG_SIZE):
+def geojson2png(df_gpd=None, tile_z=0, tile_x=0, tile_y=0, FIG_SIZE=FIG_SIZE):
     """create png data from geojson data
 
     create png data from geojson data(geopandas)
@@ -17,12 +17,12 @@ def geojson2png(df_gpd=None, tile_x=0, tile_y=0, tile_z=0, FIG_SIZE=FIG_SIZE):
     ----------
     df_gpd : geopandas.DataFrame
         source data for creating raster image
+    tile_z : int
+        tile z coords
     tile_x : int
         tile x coords
     tile_y : int
         tile y coords
-    tile_z : int
-        tile z coords
     FIG_SIZE : int
         raster image size
 
@@ -98,7 +98,7 @@ def geojson2png(df_gpd=None, tile_x=0, tile_y=0, tile_z=0, FIG_SIZE=FIG_SIZE):
     return im_flip
 
 
-def geojson_file2png_file(inputFilePath=None, outputFilePath=None, tile_x=0, tile_y=0, tile_z=0, FIG_SIZE=FIG_SIZE):
+def geojson_file2png_file(inputFilePath=None, outputFilePath=None, tile_z=0, tile_x=0, tile_y=0, FIG_SIZE=FIG_SIZE):
     """output png file from geojson file
 
     Parameters
@@ -107,19 +107,19 @@ def geojson_file2png_file(inputFilePath=None, outputFilePath=None, tile_x=0, til
         source data file path(geojson)
     outputFilePath : str
         output data file path(png)
+    tile_z : int
+        tile z coords
     tile_x : int
         tile x coords
     tile_y : int
         tile y coords
-    tile_z : int
-        tile z coords
     FIG_SIZE : int
         raster image size
             
     """
 
     df_gpd = gpd.read_file(inputFilePath) # geojson -> geopandas.DataFrame
-    im = geojson2png(df_gpd, tile_x, tile_y, tile_z, FIG_SIZE)
+    im = geojson2png(df_gpd, tile_z, tile_x, tile_y, FIG_SIZE)
     im.save(outputFilePath) # イメージ出力
 
 
@@ -129,5 +129,5 @@ if __name__ == "__main__":
     else:
         geojson_file2png_file(
             sys.argv[1], sys.argv[2], # path args
-            sys.argv[3], sys.argv[4], sys.argv[5] # x/y/z args
+            sys.argv[3], sys.argv[4], sys.argv[5] # z/x/y args
         )
