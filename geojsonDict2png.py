@@ -26,6 +26,8 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
         raster image data(Pillow format)
             
     """
+    if len(geojsonDict) == 0:
+        return Image.new("RGBA", (FIG_SIZE, FIG_SIZE), (0,0,0,0)) # make transparent for empty dataset
 
     # initialize
     im = Image.new("RGB", (FIG_SIZE, FIG_SIZE), 0)
@@ -126,7 +128,8 @@ def geojson_file2png_file(inputFilePath=None, outputFilePath=None, tile_z=0, til
     geojsonDict = read_tiles(mbtilesPath=inputFilePath, tileCoordsList=tileCoordsList)
     # print(geojsonDict[0])
     im = geojsonDict2png(geojsonDict[0], FIG_SIZE)
-    im.save(outputFilePath) # イメージ出力
+    with open(outputFilePath, mode="wb") as f:
+        im.save(fp=f) # イメージ出力
 
 
 if __name__ == "__main__":
