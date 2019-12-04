@@ -11,6 +11,8 @@ geopandas = "*"
 shapely = "*"
 flask = "*"
 requests = "*"
+mapbox-vector-tile = "*"
+pymbtiles = "*"
 
 [requires]
 python_version = "3.6"

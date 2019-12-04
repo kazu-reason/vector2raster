@@ -12,13 +12,25 @@ $ pip install pipenv
 ```
 
 ## Usage
+### Preparation
 ```bash
 # copy .env template and edit
 $ cp .env_template .env
 
 # pipenv preparation
 $ pipenv sync
+```
+
+### Convert from geojson
+```bash
+# start server
 $ pipenv run start
+```
+
+### Convert from mbtiles
+```bash
+# file to file conversion
+$ python geojsonDict2png.py your_mbtiles output.png x y z 
 ```
 
 ## Feature work
