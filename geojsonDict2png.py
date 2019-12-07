@@ -26,12 +26,14 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
         raster image data(Pillow format)
             
     """
-    if len(geojsonDict) == 0:
-        return Image.new("RGBA", (FIG_SIZE, FIG_SIZE), (0,0,0,0)) # make transparent for empty dataset
 
     # initialize
-    im = Image.new("RGB", (FIG_SIZE, FIG_SIZE), 0)
+    im = Image.new("RGBA", (FIG_SIZE, FIG_SIZE), (0,0,0,0))
     draw = ImageDraw.Draw(im)
+    
+    # return all transparent layer for empty dataset
+    if len(geojsonDict) == 0:
+        return im
 
     dictContent = geojsonDict.get(list(geojsonDict.keys())[0])
     extent = dictContent.get("extent")
