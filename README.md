@@ -14,14 +14,18 @@ $ pip install pipenv
 ## Usage
 ### Preparation
 ```bash
-# copy .env template and edit
-$ cp .env_template .env
+# copy .env_template, setting_template.py and edit
+# $ cp .env_template .env
+$ cp setting_template.py setting.py
 
 # pipenv preparation
 $ pipenv sync
 ```
 
 ### Convert from geojson
+<!-- To receive geojson, you have to specify the geojson server in `.env`. -->
+To receive geojson, you have to specify the geojson server in `setting.py`.
+
 ```bash
 # start server
 $ pipenv run start
@@ -44,3 +48,5 @@ $ python geojsonDict2png.py your_mbtiles output.png z x y
     - csv 
     - DB
 - Support more geojson feature types
+- Change library from Pillow to Pillow-SIMD
+  - https://qiita.com/koshian2/items/c26656a565e42093069d
