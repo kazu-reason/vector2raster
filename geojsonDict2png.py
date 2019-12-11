@@ -1,14 +1,14 @@
 import sys
-import random
 import itertools
 from math import pi, e, atan
 from PIL import Image, ImageDraw, ImageOps
 import shapely
 from handle_mbtiles import read_tiles
+from style import get_color_from_sqlite, get_random_color
 
 FIG_SIZE = 256
 
-def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
+def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE, random_color=False):
     """create png data from geojson data
 
     create png data from geojson data(geopandas)
@@ -19,6 +19,8 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
         source data for creating raster image
     FIG_SIZE : int
         raster image size
+    random_color : boolean(default:False)
+        decide to use random coloring or styled coloring
 
     Returns
     -------
@@ -48,8 +50,13 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
         return (image_x, image_y)
     
 
-    def polygon_loop(geometryCoords=None, draw=None):
+    def polygon_loop(geometryCoords=None, draw=None, KEY_CODE=None):
         func_PII = position_in_image
+        if not random_color:
+            func_get_color = get_color_from_sqlite
+        else:
+            func_get_color = random_color
+
         for coords_1 in geometryCoords:
             image_xy_list = []
             for coords_2 in coords_1:
@@ -58,16 +65,18 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
                 image_xy_list.append(image_coords)
 
             # draw polygons from image_xy_list
-            rand_tuple = (
-                55+random.randint(0,200),
-                55+random.randint(0,200),
-                55+random.randint(0,200)
-            )
-            draw.polygon(xy=image_xy_list, fill=rand_tuple)
+            rand_tuple = func_get_color(KEY_CODE)
+            if rand_tuple != (0,0,0):
+                draw.polygon(xy=image_xy_list, fill=rand_tuple)
     
     
-    def multiPolygon_loop(geometryCoords=None, draw=None):
+    def multiPolygon_loop(geometryCoords=None, draw=None, KEY_CODE=None):
         func_PII = position_in_image
+        if not random_color:
+            func_get_color = get_color_from_sqlite
+        else:
+            func_get_color = random_color
+
         for coords_1 in geometryCoords:
             for coords_2 in coords_1:
                 image_xy_list = []
@@ -77,12 +86,9 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
                     image_xy_list.append(image_coords)
 
                 # draw polygons from image_xy_list
-                rand_tuple = (
-                    55+random.randint(0,200),
-                    55+random.randint(0,200),
-                    55+random.randint(0,200)
-                )
-                draw.polygon(xy=image_xy_list, fill=rand_tuple)
+                rand_tuple = func_get_color(KEY_CODE)
+                if rand_tuple != (0,0,0):
+                    draw.polygon(xy=image_xy_list, fill=rand_tuple)
     
 
     for feature in features:
@@ -93,9 +99,9 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
         KEY_CODE = properties.get("KEY_CODE")
 
         if geometryType == "Polygon":
-            polygon_loop(geometryCoords=geometryCoords, draw=draw)
+            polygon_loop(geometryCoords=geometryCoords, draw=draw, KEY_CODE=KEY_CODE)
         elif geometryType == "MultiPolygon":
-            multiPolygon_loop(geometryCoords=geometryCoords, draw=draw)
+            multiPolygon_loop(geometryCoords=geometryCoords, draw=draw, KEY_CODE=KEY_CODE)
 
     # flip because 
     # Pillow's      axis origin is left upper side
@@ -106,7 +112,10 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
     return im_flip
 
 
-def geojson_file2png_file(inputFilePath=None, outputFilePath=None, tile_z=0, tile_x=0, tile_y=0, FIG_SIZE=FIG_SIZE):
+def geojson_file2png_file(
+    inputFilePath=None, outputFilePath=None, 
+    tile_z=0, tile_x=0, tile_y=0, 
+    FIG_SIZE=FIG_SIZE, random_color=False):
     """output png file from geojson file
 
     Parameters
@@ -123,13 +132,15 @@ def geojson_file2png_file(inputFilePath=None, outputFilePath=None, tile_z=0, til
         tile y coords
     FIG_SIZE : int
         raster image size
+    random_color : boolean(default:False)
+        decide to use random coloring or styled coloring
             
     """
     z,x,y = int(tile_z),int(tile_x),int(tile_y)
     tileCoordsList = [(z,x,y)]
     geojsonDict = read_tiles(mbtilesPath=inputFilePath, tileCoordsList=tileCoordsList)
     # print(geojsonDict[0])
-    im = geojsonDict2png(geojsonDict[0], FIG_SIZE)
+    im = geojsonDict2png(geojsonDict[0], FIG_SIZE, random_color=random_color)
     with open(outputFilePath, mode="wb") as f:
         im.save(fp=f) # イメージ出力
 
