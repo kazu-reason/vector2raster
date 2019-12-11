@@ -5,6 +5,7 @@ import json
 from flask import Flask, send_file
 from geopandas import GeoDataFrame
 from geojson2png import geojson2png
+import setting
 
 app = Flask(__name__)
 
@@ -22,7 +23,7 @@ def hello():
 @app.route('/image/<z>/<x>/<y>')
 def serve_img(z=None,x=None,y=None):
     y = y.replace('.png', '')
-    url = os.environ['GEOJSON_SRC_URL'].format(z,x,y)
+    url = setting.GEOJSON_SRC_URL.format(z,x,y)
     response = requests.get(url)
     features = json.loads(response.text)["features"]
     df_gpd = GeoDataFrame.from_features(features).loc[:,["KEY_CODE", "geometry"]]
