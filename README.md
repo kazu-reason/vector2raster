@@ -29,6 +29,8 @@ $ pipenv run start
 
 ### Convert from mbtiles
 ```bash
+# enter to the pipenv
+$ pipenv shell
 # file to file conversion
 $ python geojsonDict2png.py your_mbtiles output.png z x y
 ```
