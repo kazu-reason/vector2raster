@@ -5,6 +5,8 @@ import json
 from flask import Flask, send_file
 from geopandas import GeoDataFrame
 from geojson2png import geojson2png
+from geojsonDict2png import geojsonDict2png
+from handle_mbtiles import read_tiles
 import setting
 
 app = Flask(__name__)
@@ -15,14 +17,7 @@ def serve_pil_image(pil_image):
     imageIO.seek(0)
     return send_file(imageIO, mimetype='image/png')
 
-@app.route('/')
-def hello():
-    string = "Hellow Pillow app"
-    return string
-
-@app.route('/image/<z>/<x>/<y>')
-def serve_img(z=None,x=None,y=None):
-    y = y.replace('.png', '')
+def get_gpd_df(z,x,y):
     url = setting.GEOJSON_SRC_URL.format(z,x,y)
     response = requests.get(url)
     features = json.loads(response.text)["features"]
@@ -32,6 +27,36 @@ def serve_img(z=None,x=None,y=None):
         tile_z=z,tile_x=x, tile_y=y,
         FIG_SIZE=256
     )
+
+    return im
+
+
+def get_geojsonDict(z,x,y):
+    z,x,y = int(z),int(x),int(y)
+    tileCoordsList = [(z,x,y)]
+    geojsonDict = read_tiles(mbtilesPath=setting.mbtiles_path, tileCoordsList=tileCoordsList)
+    im = geojsonDict2png(geojsonDict=geojsonDict[0], FIG_SIZE=256)
+
+    return im
+
+@app.route('/')
+def hello():
+    string = "Hellow Pillow app"
+    return string
+
+@app.route('/image-geojson/<z>/<x>/<y>')
+def serve_img_geojson(z=None,x=None,y=None):
+    y = y.replace('.png', '')
+    im = get_gpd_df(z,x,y)
+    send_content = serve_pil_image(im)
+    
+    return send_content
+
+
+@app.route('/image-mbtiles/<z>/<x>/<y>')
+def serve_img_mbtiles(z=None,x=None,y=None):
+    y = y.replace('.png', '')
+    im = get_geojsonDict(z,x,y)
     send_content = serve_pil_image(im)
     
     return send_content
