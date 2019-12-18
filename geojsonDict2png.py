@@ -11,7 +11,7 @@ FIG_SIZE = 256
 def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE, random_color=False):
     """create png data from geojson data
 
-    create png data from geojson data(geopandas)
+    create png data from geojson data(does not use geopandas)
 
     Parameters
     ----------
