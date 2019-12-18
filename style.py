@@ -19,7 +19,7 @@ def get_color_from_sqlite(KEY_CODE=None):
         search_str=str(KEY_CODE)
     )
 
-    if value is None:
+    if value is None or value[0] is None:
         return (0,0,0)
     value = float(value[0])
 
