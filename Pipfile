@@ -7,13 +7,13 @@ verify_ssl = true
 pylint = "*"
 
 [packages]
-pillow = "*"
 geopandas = "*"
 shapely = "*"
 flask = "*"
 requests = "*"
 mapbox-vector-tile = "*"
 pymbtiles = "*"
+pillow-simd = "*"
 
 [requires]
 python_version = "3.6"
