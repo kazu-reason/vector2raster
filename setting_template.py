@@ -30,7 +30,10 @@ def thresholds_function(value = 0):
 ###########################
 
 # mbtiles source
-mbtiles_path="mbtiles_path"
+mbtiles = {
+    "path": "mbtiles_path",
+    "key_name": "KEY_CODE_NAME_TO_LINK_YOUR_DATA"
+}
 
 
 # geojson source

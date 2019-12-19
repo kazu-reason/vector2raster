@@ -34,7 +34,7 @@ def get_gpd_df(z,x,y):
 def get_geojsonDict(z,x,y):
     z,x,y = int(z),int(x),int(y)
     tileCoordsList = [(z,x,y)]
-    geojsonDict = read_tiles(mbtilesPath=setting.mbtiles_path, tileCoordsList=tileCoordsList)
+    geojsonDict = read_tiles(mbtilesPath=setting.mbtiles["path"], tileCoordsList=tileCoordsList)
     im = geojsonDict2png(geojsonDict=geojsonDict[0], FIG_SIZE=256)
 
     return im

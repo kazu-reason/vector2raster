@@ -5,6 +5,7 @@ from PIL import Image, ImageDraw, ImageOps
 import shapely
 from handle_mbtiles import read_tiles
 from style import get_color_from_sqlite, get_random_color
+import setting
 
 FIG_SIZE = 256
 
@@ -96,7 +97,7 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE, random_color=False):
         geometryType = geometry.get("type")
         geometryCoords = geometry.get("coordinates")
         properties = feature.get("properties")
-        KEY_CODE = properties.get("KEY_CODE")
+        KEY_CODE = properties.get(setting.mbtiles.get("key_name"))
 
         if geometryType == "Polygon":
             polygon_loop(geometryCoords=geometryCoords, draw=draw, KEY_CODE=KEY_CODE)
