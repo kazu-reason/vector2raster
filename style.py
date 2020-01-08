@@ -23,7 +23,7 @@ def get_color_from_sqlite(KEY_CODE=None):
         return (0,0,0)
     value = float(value[0])
 
-    return setting.thresholds_function(value=value)
+    return setting.style_function(value=value)
 
 def get_random_color(KEY_CODE):
     rand_tuple = (

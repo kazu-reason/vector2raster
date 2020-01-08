@@ -7,6 +7,9 @@ from math import isclose
 # setting for STYLE #
 #####################
 style_format = "level"
+# style_function get (value:int) and return ((R,G,B):(int,int,int))
+style_function = thresholds_function
+
 thresholds_list = [0,0.5,1,5,10]
 rgba_style_list = [
     (0,0,0),(50,174,183),(50,67,183),
