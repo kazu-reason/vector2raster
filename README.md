@@ -8,40 +8,47 @@
 ## Requirements
 Using pipenv for virtualenv and package management
 ```bash
-$ pip install pipenv
+pip install pipenv
 ```
 
 ## Usage
 ### Preparation
 ```bash
 # copy .env_template, setting_template.py and edit
-# $ cp .env_template .env
-$ cp setting_template.py setting.py
+# cp .env_template .env
+cp setting_template.py setting.py
 
 # pipenv preparation
-$ pipenv sync
+pipenv sync
 ```
 
 ### Convert from geojson
+To serve geojson, you have to run geojson server(XYZ style).  
+Show an example using [TileServer GL](https://github.com/maptiler/tileserver-gl) below.
+
+```bash
+# run TileServer GL
+docker run --rm -it -v $(pwd):/data -p 8080:80 klokantech/tileserver-gl
+```
+
 <!-- To receive geojson, you have to specify the geojson server in `.env`. -->
 To receive geojson, you have to specify the geojson server in `setting.py`.
 
 ```bash
 # start server
-$ pipenv run start
+pipenv run start
 ```
 
 Access to your dev Server
-`http://127.0.0.1:5000/image-mbtiles/<z>/<x>/<y>.png`
-
+`http://127.0.0.1:5000/image-mbtiles/<z>/<x>/<y>.png`  
 Port may change. Check your server console.
 
 ### Convert from mbtiles
 ```bash
 # enter to the pipenv
-$ pipenv shell
+pipenv shell
 # file to file conversion
-$ python geojsonDict2png.py your_mbtiles output.png z x y
+python geojsonDict2png.py your_mbtiles output.png z x y
 ```
 
 ## Feature work
@@ -53,5 +60,6 @@ $ python geojsonDict2png.py your_mbtiles output.png z x y
     - DB
       - developing
 - Support more geojson feature types
+- Support docker
 <!-- - Change library from Pillow to Pillow-SIMD
   - https://qiita.com/koshian2/items/c26656a565e42093069d -->
