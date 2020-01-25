@@ -4,12 +4,12 @@ from math import pi, e, atan
 from PIL import Image, ImageDraw, ImageOps
 import shapely
 from handle_mbtiles import read_tiles
-from style import get_color_from_sqlite, get_random_color
+from style import get_color_from_sqlite, get_color_from_postgresql, get_random_color
 import setting
 
 FIG_SIZE = 256
 
-def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE, random_color=False):
+def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
     """create png data from geojson data
 
     create png data from geojson data(does not use geopandas)
@@ -20,8 +20,8 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE, random_color=False):
         source data for creating raster image
     FIG_SIZE : int
         raster image size
-    random_color : boolean(default:False)
-        decide to use random coloring or styled coloring
+    color_src : str(default:'random')
+        decide to use random coloring or specify DB to get value
 
     Returns
     -------
@@ -39,9 +39,16 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE, random_color=False):
         return im
 
     dictContent = geojsonDict.get(list(geojsonDict.keys())[0])
+    features = dictContent.get("features")
     extent = dictContent.get("extent")
     DPI = FIG_SIZE / extent # dot per extent
-    features = dictContent.get("features")
+    color_src = setting.color_src
+    if color_src == "sqlite":
+        func_get_color = get_color_from_sqlite
+    elif color_src == "postgresql":
+        func_get_color = get_color_from_postgresql
+    else:
+        func_get_color = color_src
     
 
     def position_in_image(geom_x, geom_y):
@@ -53,10 +60,6 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE, random_color=False):
 
     def polygon_loop(geometryCoords=None, draw=None, KEY_CODE=None):
         func_PII = position_in_image
-        if not random_color:
-            func_get_color = get_color_from_sqlite
-        else:
-            func_get_color = random_color
 
         for coords_1 in geometryCoords:
             image_xy_list = []
@@ -73,10 +76,6 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE, random_color=False):
     
     def multiPolygon_loop(geometryCoords=None, draw=None, KEY_CODE=None):
         func_PII = position_in_image
-        if not random_color:
-            func_get_color = get_color_from_sqlite
-        else:
-            func_get_color = random_color
 
         for coords_1 in geometryCoords:
             for coords_2 in coords_1:
@@ -116,7 +115,7 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE, random_color=False):
 def geojson_file2png_file(
     inputFilePath=None, outputFilePath=None, 
     tile_z=0, tile_x=0, tile_y=0, 
-    FIG_SIZE=FIG_SIZE, random_color=False):
+    FIG_SIZE=FIG_SIZE):
     """output png file from geojson file
 
     Parameters
@@ -133,15 +132,12 @@ def geojson_file2png_file(
         tile y coords
     FIG_SIZE : int
         raster image size
-    random_color : boolean(default:False)
-        decide to use random coloring or styled coloring
             
     """
     z,x,y = int(tile_z),int(tile_x),int(tile_y)
     tileCoordsList = [(z,x,y)]
     geojsonDict = read_tiles(mbtilesPath=inputFilePath, tileCoordsList=tileCoordsList)
-    # print(geojsonDict[0])
-    im = geojsonDict2png(geojsonDict[0], FIG_SIZE, random_color=random_color)
+    im = geojsonDict2png(geojsonDict[0], FIG_SIZE)
     with open(outputFilePath, mode="wb") as f:
         im.save(fp=f) # イメージ出力
 

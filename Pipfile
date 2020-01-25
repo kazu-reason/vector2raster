@@ -14,6 +14,9 @@ requests = "*"
 mapbox-vector-tile = "*"
 pymbtiles = "*"
 pillow-simd = "*"
+sqlalchemy = "*"
+python-dotenv = "*"
+psycopg2 = "*"
 
 [requires]
 python_version = "3.6"

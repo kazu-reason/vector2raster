@@ -44,10 +44,16 @@ GEOJSON_SRC_URL="http://localhost:8080/your_geojson_data/{0}/{1}/{2}.geojson"
 
 
 # Style source
+color_src = "postgresql"
 # sqlite
 style_data_sqlite = {
     "db_path": "sqlite_file_path", "target_col": "col_name_which_you_want_to_get", 
     "table_name": "target_table_name", "idx_col": "col_name_which_has_key_code"
+}
+# postgresql
+style_data_postgresql = {
+    "target_col": "val", 
+    "table_name": "layer_value_1", "idx_col": "mesh_code"
 }
 # csv
 csvFilePath="path_to_your.csv"
