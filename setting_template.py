@@ -6,11 +6,11 @@ from dotenv import load_dotenv
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
-PSQL_PASS = os.environ.get("PSQL_PASS")
-PSQL_HOST = os.environ.get("PSQL_HOST")
-PSQL_PORT = os.environ.get("PSQL_PORT")
-PSQL_USER = os.environ.get("PSQL_USER")
-PSQL_DBNAME = os.environ.get("PSQL_DBNAME")
+PSQL_PASS = # os.environ.get("PSQL_PASS")
+PSQL_HOST = # os.environ.get("PSQL_HOST")
+PSQL_PORT = # os.environ.get("PSQL_PORT")
+PSQL_USER = # os.environ.get("PSQL_USER")
+PSQL_DBNAME = # os.environ.get("PSQL_DBNAME")
 
 # This file is setting example
 # Please copy this file as setting.py and edit to suit your project

@@ -9,7 +9,7 @@ import setting
 
 FIG_SIZE = 256
 
-def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
+def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE, **kwargs):
     """create png data from geojson data
 
     create png data from geojson data(does not use geopandas)
@@ -69,7 +69,7 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
                 image_xy_list.append(image_coords)
 
             # draw polygons from image_xy_list
-            rand_tuple = func_get_color(KEY_CODE)
+            rand_tuple = func_get_color(KEY_CODE, **kwargs)
             if rand_tuple != (0,0,0):
                 draw.polygon(xy=image_xy_list, fill=rand_tuple)
     
@@ -86,7 +86,7 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
                     image_xy_list.append(image_coords)
 
                 # draw polygons from image_xy_list
-                rand_tuple = func_get_color(KEY_CODE)
+                rand_tuple = func_get_color(KEY_CODE, **kwargs)
                 if rand_tuple != (0,0,0):
                     draw.polygon(xy=image_xy_list, fill=rand_tuple)
     
@@ -115,7 +115,7 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE):
 def geojson_file2png_file(
     inputFilePath=None, outputFilePath=None, 
     tile_z=0, tile_x=0, tile_y=0, 
-    FIG_SIZE=FIG_SIZE):
+    FIG_SIZE=FIG_SIZE, **kwargs):
     """output png file from geojson file
 
     Parameters
@@ -132,11 +132,11 @@ def geojson_file2png_file(
         tile y coords
     FIG_SIZE : int
         raster image size
-            
+    
     """
     z,x,y = int(tile_z),int(tile_x),int(tile_y)
     tileCoordsList = [(z,x,y)]
-    geojsonDict = read_tiles(mbtilesPath=inputFilePath, tileCoordsList=tileCoordsList)
+    geojsonDict = read_tiles(mbtilesPath=inputFilePath, tileCoordsList=tileCoordsList, **kwargs)
     im = geojsonDict2png(geojsonDict[0], FIG_SIZE)
     with open(outputFilePath, mode="wb") as f:
         im.save(fp=f) # イメージ出力

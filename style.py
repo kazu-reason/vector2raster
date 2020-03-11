@@ -15,10 +15,10 @@ def get_color_from_csv(KEY_CODE=None):
     return setting.thresholds_function(value=value)
 
 
-def get_color_from_sqlite(KEY_CODE=None):
+def get_color_from_sqlite(KEY_CODE=None, **kwargs):
     value = handle_sqlite.fetch_data(
         **setting.style_data_sqlite,
-        search_str=str(KEY_CODE)
+        search_str=str(KEY_CODE),
     )
 
     if value is None or value[0] is None:
@@ -28,10 +28,15 @@ def get_color_from_sqlite(KEY_CODE=None):
     return setting.style_function(value=value)
 
 
-def get_color_from_postgresql(KEY_CODE=None):
+def get_color_from_postgresql(KEY_CODE=None, **kwargs):
+    search_str = [str(KEY_CODE)]
+    # keycode以外の条件を追加(optional)
+    search_str.append(kwargs.get("additional_condition", []))
+    # 使用するSQLを指定(SQL文が配列に格納されていることを想定)
+    sql_num = kwargs.get("sql_num", 0)
     value = handle_postgresql.fetch_data(
-        **setting.style_data_postgresql,
-        search_str=str(KEY_CODE)
+        setting.style_data_postgresql.get("base_sql")[sql_num],
+        search_str=search_str,
     )
 
     if value is None or value[0] is None:

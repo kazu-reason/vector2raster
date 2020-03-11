@@ -29,7 +29,7 @@ def fetch_data(db_path, target_col, table_name, idx_col, search_str):
     # create query string by using format
     # we cannot use execute parameter in column/table name
     query_str = (
-        "SELECT {} FROM {} WHERE {} = :search"
+        "SELECT {0} FROM {1} WHERE {2} = :search"
         .format(scrub(target_col), scrub(table_name), scrub(idx_col))
     )
     c.execute(query_str,({"search": search_str}))

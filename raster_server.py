@@ -2,7 +2,7 @@ from io import BytesIO
 import os
 import requests
 import json
-from flask import Flask, send_file
+from flask import Flask, send_file, request
 from geopandas import GeoDataFrame
 from geojson2png import geojson2png
 from geojsonDict2png import geojsonDict2png
@@ -55,8 +55,10 @@ def serve_img_geojson(z=None,x=None,y=None):
 
 @app.route('/image-mbtiles/<z>/<x>/<y>')
 def serve_img_mbtiles(z=None,x=None,y=None):
+    delta = request.args.get("delta")
+    date_info = request.args.get("date_info")
     y = y.replace('.png', '')
-    im = get_geojsonDict(z,x,y)
+    im = get_geojsonDict(z,x,y,delta=delta,date_info=date_info)
     send_content = serve_pil_image(im)
     
     return send_content
