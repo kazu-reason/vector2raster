@@ -22,28 +22,30 @@ def get_color_from_sqlite(KEY_CODE=None, **kwargs):
     )
 
     if value is None or value[0] is None:
-        return (0,0,0)
+        return None
     value = float(value[0])
 
     return setting.style_function(value=value)
 
 
-def get_color_from_postgresql(KEY_CODE=None, **kwargs):
-    search_str = [str(KEY_CODE)]
+def get_color_from_postgresql(KEY_CODE_LIST=None, **kwargs):
+    search_str = {"KEY_CODE_LIST":KEY_CODE_LIST}
     # keycode以外の条件を追加(optional)
-    search_str.append(kwargs.get("additional_condition", []))
+    search_str.update(kwargs)
     # 使用するSQLを指定(SQL文が配列に格納されていることを想定)
     sql_num = kwargs.get("sql_num", 0)
+    # print(setting.style_data_postgresql.get("base_sqls"))
     value = handle_postgresql.fetch_data(
-        setting.style_data_postgresql.get("base_sql")[sql_num],
+        setting.style_data_postgresql.get("base_sqls")[sql_num],
         search_str=search_str,
     )
 
-    if value is None or value[0] is None:
-        return (0,0,0)
-    value = float(value[0])
+    # if value is None or value[0] is None:
+    #     return None
+    # value = float(value[0])
 
-    return setting.style_function(value=value)
+    # return setting.style_function(value=value)
+    return value
 
 
 def get_random_color(KEY_CODE):

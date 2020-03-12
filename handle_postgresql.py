@@ -1,19 +1,24 @@
 import sys
 from sqlalchemy import create_engine
 import psycopg2
+from psycopg2 import sql
 import setting
 
-def fetch_data(base_sql, search_str):
+def fetch_data(KEY_CODE_LIST=None, **kwargs):
     """fetch_data from postgresql DB
     Parameters
     ----------
+    KEY_CODE_LIST : [str]
+        target key code list
+    sql_num : int
+        the number which specify base sql
+    
+    Deprecated
     base_sql : str
         base sql that base_info(target [col, table], ) is already fulfilled, but must fill search_str(%s)
     search_str : [str, ...]
         string which is used in search placeholders.
         must embed to base_sql.
-    
-    Deprecated
     target_col : str
         column name to fetch
     table_name : str
@@ -27,25 +32,20 @@ def fetch_data(base_sql, search_str):
         return value from postgreSQL
     """
     # initialize connection
-    url = f'postgresql+psycopg2://{setting.PSQL_USER}:{setting.PSQL_PASS}@{setting.PSQL_HOST}:{setting.PSQL_PORT}/{setting.PSQL_DBNAME}'
-    engine = create_engine(url)
+    url = f'postgresql://{setting.PSQL_USER}:{setting.PSQL_PASS}@{setting.PSQL_HOST}:{setting.PSQL_PORT}/{setting.PSQL_DBNAME}'
     
-    # pass str only 0-9,a-z,A-Z
-    scrub = lambda string: ''.join( chr for chr in string if chr.isalnum() )
-    # create query string by using format
-    # we cannot use execute parameter in column/table name
-    # query_str = (
-    #     "SELECT {0} FROM {1} WHERE {2} = %(search)s and delta = %(time)s and date_info = %(latestDate)s"
-    #     .format(target_col, table_name, idx_col)
-    # )
-    with engine.connect() as con:
-        data = con.execute(base_sql, *search_str)
-        listed = list(data)
-    engine.dispose()
-    if listed is None or len(listed) == 0:
-        return None
-    else:
-        return listed[0]
+    search_str = {"KEY_CODE_LIST":KEY_CODE_LIST}
+    # keycode以外の条件を追加(optional)
+    search_str.update(kwargs)
+    # 使用するSQLを指定(SQL文が配列に格納されていることを想定)
+    sql_num = kwargs.get("sql_num", 0)
+    base_sql = setting.style_data_postgresql.get("base_sqls")[sql_num]
+
+    with psycopg2.connect(url) as con:
+        with con.cursor('vector2raster') as cur:
+            cur.execute(sql.SQL(base_sql).format(sql.Identifier(search_str.get("table_name"))), search_str)
+            res = cur.fetchall()
+            return res
 
 if __name__ == "__main__":
     # data = fetch_data(

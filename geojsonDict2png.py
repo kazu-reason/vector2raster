@@ -20,7 +20,7 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE, **kwargs):
         source data for creating raster image
     FIG_SIZE : int
         raster image size
-    color_src : str(default:'random')
+    value_src : str(default:'random')
         decide to use random coloring or specify DB to get value
 
     Returns
@@ -31,7 +31,7 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE, **kwargs):
     """
 
     # initialize
-    im = Image.new("RGBA", (FIG_SIZE, FIG_SIZE), (0,0,0,0))
+    im = Image.new("RGBA", (FIG_SIZE, FIG_SIZE), (255,255,255,0))
     draw = ImageDraw.Draw(im)
     
     # return all transparent layer for empty dataset
@@ -42,13 +42,16 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE, **kwargs):
     features = dictContent.get("features")
     extent = dictContent.get("extent")
     DPI = FIG_SIZE / extent # dot per extent
-    color_src = setting.color_src
-    if color_src == "sqlite":
-        func_get_color = get_color_from_sqlite
-    elif color_src == "postgresql":
-        func_get_color = get_color_from_postgresql
+    value_src = setting.value_src
+    if value_src == "sqlite":
+        from handle_sqlite import fetch_data
+    elif value_src in "postgresql":
+        from handle_postgresql import fetch_data
+    
+    if value_src in ["sqlite", "postgresql"]:
+        func_get_color = setting.style_function
     else:
-        func_get_color = color_src
+        func_get_color = get_random_color
     
 
     def position_in_image(geom_x, geom_y):
@@ -58,7 +61,7 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE, **kwargs):
         return (image_x, image_y)
     
 
-    def polygon_loop(geometryCoords=None, draw=None, KEY_CODE=None):
+    def polygon_loop(geometryCoords=None, draw=None, color=None):
         func_PII = position_in_image
 
         for coords_1 in geometryCoords:
@@ -69,12 +72,11 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE, **kwargs):
                 image_xy_list.append(image_coords)
 
             # draw polygons from image_xy_list
-            rand_tuple = func_get_color(KEY_CODE, **kwargs)
-            if rand_tuple != (0,0,0):
-                draw.polygon(xy=image_xy_list, fill=rand_tuple)
+            if color is not None:
+                draw.polygon(xy=image_xy_list, fill=color)
     
     
-    def multiPolygon_loop(geometryCoords=None, draw=None, KEY_CODE=None):
+    def multiPolygon_loop(geometryCoords=None, draw=None, color=None):
         func_PII = position_in_image
 
         for coords_1 in geometryCoords:
@@ -86,22 +88,40 @@ def geojsonDict2png(geojsonDict=None, FIG_SIZE=FIG_SIZE, **kwargs):
                     image_xy_list.append(image_coords)
 
                 # draw polygons from image_xy_list
-                rand_tuple = func_get_color(KEY_CODE, **kwargs)
-                if rand_tuple != (0,0,0):
-                    draw.polygon(xy=image_xy_list, fill=rand_tuple)
+                if color is not None:
+                    draw.polygon(xy=image_xy_list, fill=color)
     
-
+    geometry_dict = {}
+    KEY_CODE_list = []
     for feature in features:
         geometry = feature.get("geometry")
         geometryType = geometry.get("type")
         geometryCoords = geometry.get("coordinates")
         properties = feature.get("properties")
-        KEY_CODE = properties.get(setting.mbtiles.get("key_name"))
+        KEY_CODE = str(properties.get(setting.mbtiles.get("key_name")))
+        geometry_dict[KEY_CODE] = (geometryType, geometryCoords)
+        KEY_CODE_list.append(KEY_CODE)
 
+    key_code_list_len = len(KEY_CODE_list)
+    # SQLのANY対象にできる配列の要素数上限に対応するための処理
+    array_limit = 1000
+    if key_code_list_len < 1001:
+        rows = fetch_data(KEY_CODE_list, **kwargs) # return [(KEY_CODE, val),]
+    else:
+        rows = []
+        for i in range(0,key_code_list_len//array_limit):
+            i = i*array_limit
+            rows.extend(fetch_data(KEY_CODE_list[i:i+array_limit], **kwargs)) # return [(KEY_CODE, val),]
+        if key_code_list_len%array_limit != 0:
+            rows.extend(fetch_data(KEY_CODE_list[i+array_limit:], **kwargs)) # return [(KEY_CODE, val),]
+
+    for row in rows:
+        geometryType, geometryCoords = geometry_dict[row[0]]
+        color = func_get_color(row[1])
         if geometryType == "Polygon":
-            polygon_loop(geometryCoords=geometryCoords, draw=draw, KEY_CODE=KEY_CODE)
+            polygon_loop(geometryCoords=geometryCoords, draw=draw, color=color)
         elif geometryType == "MultiPolygon":
-            multiPolygon_loop(geometryCoords=geometryCoords, draw=draw, KEY_CODE=KEY_CODE)
+            multiPolygon_loop(geometryCoords=geometryCoords, draw=draw, color=color)
 
     # flip because 
     # Pillow's      axis origin is left upper side

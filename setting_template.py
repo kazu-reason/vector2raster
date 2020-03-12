@@ -24,14 +24,14 @@ style_function = thresholds_function
 
 thresholds_list = [0,0.5,1,5,10]
 rgba_style_list = [
-    (0,0,0),(50,174,183),(50,67,183),
+    None,(50,174,183),(50,67,183),
     (84,183,50),(224,54,27)]
 def thresholds_function(value = 0):
     if len(thresholds_list) != len(rgba_style_list):
         print("style_setting is incorrect")
-        return (0,0,0)
+        return None
     if isclose(value, 0.0):
-        return (0,0,0)
+        return None
     for idx, threshold in enumerate(thresholds_list):
         if threshold > value: # find proper style threshold in list
             return rgba_style_list[idx]
@@ -56,7 +56,7 @@ GEOJSON_SRC_URL="http://localhost:8080/your_geojson_data/{0}/{1}/{2}.geojson"
 
 
 # Style source
-color_src = "postgresql"
+value_src = "postgresql"
 # sqlite
 style_data_sqlite = {
     "db_path": "sqlite_file_path", "target_col": "col_name_which_you_want_to_get", 
@@ -64,8 +64,9 @@ style_data_sqlite = {
 }
 # postgresql
 style_data_postgresql = {
-    "target_col": "val", 
-    "table_name": "layer_value_1", "idx_col": "mesh_code"
+    # "target_col": "val", 
+    # "table_name": "layer_value_1", "idx_col": "mesh_code"
+    "base_sqls": ["SELECT mesh_code,val FROM {} WHERE mesh_code = ANY(%(KEY_CODE_LIST)s) and delta = %(delta)s",]
 }
 # csv
 csvFilePath="path_to_your.csv"

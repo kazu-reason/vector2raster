@@ -31,11 +31,11 @@ def get_gpd_df(z,x,y):
     return im
 
 
-def get_geojsonDict(z,x,y):
+def get_geojsonDict(z,x,y,delta,table_name):
     z,x,y = int(z),int(x),int(y)
     tileCoordsList = [(z,x,y)]
     geojsonDict = read_tiles(mbtilesPath=setting.mbtiles["path"], tileCoordsList=tileCoordsList)
-    im = geojsonDict2png(geojsonDict=geojsonDict[0], FIG_SIZE=256)
+    im = geojsonDict2png(geojsonDict=geojsonDict[0], FIG_SIZE=256, delta=delta, table_name=table_name)
 
     return im
 
@@ -57,8 +57,9 @@ def serve_img_geojson(z=None,x=None,y=None):
 def serve_img_mbtiles(z=None,x=None,y=None):
     delta = request.args.get("delta")
     date_info = request.args.get("date_info")
+    table_name = f"layer_value_1_{date_info}"
     y = y.replace('.png', '')
-    im = get_geojsonDict(z,x,y,delta=delta,date_info=date_info)
+    im = get_geojsonDict(z,x,y,delta=delta,table_name=table_name)
     send_content = serve_pil_image(im)
     
     return send_content

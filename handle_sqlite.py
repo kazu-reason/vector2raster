@@ -1,7 +1,8 @@
 import sys
 import sqlite3
+import setting
 
-def fetch_data(db_path, target_col, table_name, idx_col, search_str):
+def fetch_data(KEY_CODE=None, **kwargs):
     """fetch_data from sqlite3 DB
     Parameters
     ----------
@@ -20,6 +21,10 @@ def fetch_data(db_path, target_col, table_name, idx_col, search_str):
     (str,)
         return value from sqlite3
     """
+    arg = setting.style_data_sqlite
+    db_path, target_col, table_name, idx_col = arg["db_path"], arg["target_col"], arg["table_name"], arg["idx_col"]
+    search_str=str(KEY_CODE)
+    
     # initialize connection
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
@@ -36,7 +41,10 @@ def fetch_data(db_path, target_col, table_name, idx_col, search_str):
     data = c.fetchone()
     
     conn.close()
-    return data
+
+    if data is None or data[0] is None:
+        return None
+    return float(data[0])
 
 if __name__ == "__main__":
     data = fetch_data(
